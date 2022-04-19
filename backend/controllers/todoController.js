@@ -38,13 +38,13 @@ const updateTodo = asyncHander(async (req, res) => {
 
   const user = await User.findById(req.user.id)
   if (!user) {
-    res.status(401)
+    res.status(404)
     throw new Error('Not Found')
   }
 
   if (todos.user.toString() !== user.id) {
     res.status(401)
-    throw new Error('Not Authorized')
+    throw new Error('Unauthorized')
   }
 
   const updatedTodo = await Todo.findByIdAndUpdate(req.params.id, req.body, {
@@ -64,18 +64,19 @@ const deleteTodo = asyncHander(async (req, res) => {
   }
 
   const user = await User.findById(req.user.id)
+
   if (!user) {
-    res.status(401)
+    res.status(404)
     throw new Error('Not Found')
   }
 
   if (todos.user.toString() !== user.id) {
     res.status(401)
-    throw new Error('Not Authorized')
+    throw new Error('Unauthorized')
   }
 
-  await Todo.remove()
-  res.status(200).json({ id: req.params.id })
+  await Todo.findByIdAndRemove(req.params.id)
+  res.status(200).json({ message: 'Deleted' })
 })
 
 module.exports = {
